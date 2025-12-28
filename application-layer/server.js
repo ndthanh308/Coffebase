@@ -11,11 +11,9 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config({ path: path.join(__dirname, '.env') });
 
-// Import routes
-import authRoutes from './controllers/auth-controller.js';
-import menuRoutes from './controllers/menu-controller.js';
-import orderRoutes from './controllers/order-controller.js';
-import analyticsRoutes from './controllers/analytics-controller.js';
+// NOTE: In ESM, static imports execute before this file's code.
+// Our controllers/services import the Supabase client, which needs env vars.
+// So we load .env first (above) and then dynamically import routes below.
 
 process.on('unhandledRejection', (reason) => {
   console.error('Unhandled Promise Rejection:', reason);
@@ -55,7 +53,12 @@ app.get('/health', (req, res) => {
   res.json({ status: 'ok', message: 'Coffee Base API is running' });
 });
 
-// API Routes
+// API Routes (loaded after dotenv config)
+const { default: authRoutes } = await import('./controllers/auth-controller.js');
+const { default: menuRoutes } = await import('./controllers/menu-controller.js');
+const { default: orderRoutes } = await import('./controllers/order-controller.js');
+const { default: analyticsRoutes } = await import('./controllers/analytics-controller.js');
+
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);

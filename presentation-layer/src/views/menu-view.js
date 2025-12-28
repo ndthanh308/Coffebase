@@ -62,7 +62,11 @@ export default class MenuView {
         </section>
 
         <section class="products-grid">
-          ${products.map(product => `
+          ${products.length === 0 ? `
+            <div class="error" style="grid-column: 1 / -1;">
+              Không có sản phẩm phù hợp bộ lọc.
+            </div>
+          ` : products.map(product => `
             <div class="product-card">
               <img src="${product.image_url || '/images/placeholder.jpg'}" alt="${product.name}" />
               <h3>${product.name}</h3>

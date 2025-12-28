@@ -86,7 +86,7 @@ export class Router {
   }
 
   requiresAuth(path) {
-    const protectedRoutes = ['/cart', '/checkout', '/orders', '/profile', '/admin'];
+    const protectedRoutes = ['/checkout', '/orders', '/profile', '/admin'];
     return protectedRoutes.some(route => path.startsWith(route));
   }
 

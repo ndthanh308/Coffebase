@@ -35,7 +35,10 @@ export const apiClient = {
   },
 
   get(endpoint, params = {}) {
-    const queryString = new URLSearchParams(params).toString();
+    const cleaned = Object.fromEntries(
+      Object.entries(params).filter(([, value]) => value !== undefined && value !== null && value !== '')
+    );
+    const queryString = new URLSearchParams(cleaned).toString();
     const url = queryString ? `${endpoint}?${queryString}` : endpoint;
     return this.request(url, { method: 'GET' });
   },
