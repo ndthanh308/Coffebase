@@ -47,8 +47,8 @@ export class AnalyticsService {
   async getRevenueData(dateRange) {
     const orders = await OrderModel.findByDateRange(dateRange.start, dateRange.end);
     
-    const total = orders.reduce((sum, order) => sum + order.total, 0);
-    const dailyBreakdown = this.groupByDate(orders, 'createdAt');
+    const total = orders.reduce((sum, order) => sum + (parseFloat(order.total) || 0), 0);
+    const dailyBreakdown = this.groupByDate(orders, 'created_at');
 
     return {
       total,
@@ -73,7 +73,8 @@ export class AnalyticsService {
     // Aggregate product sales
     const productSales = {};
     orders.forEach(order => {
-      order.items.forEach(item => {
+      const items = Array.isArray(order.items) ? order.items : [];
+      items.forEach(item => {
         if (!productSales[item.productId]) {
           productSales[item.productId] = {
             productId: item.productId,
@@ -134,11 +135,15 @@ export class AnalyticsService {
   groupByDate(orders, dateField) {
     const grouped = {};
     orders.forEach(order => {
-      const date = new Date(order[dateField]).toISOString().split('T')[0];
+      const raw = order?.[dateField];
+      if (!raw) return;
+      const parsed = new Date(raw);
+      if (Number.isNaN(parsed.getTime())) return;
+      const date = parsed.toISOString().split('T')[0];
       if (!grouped[date]) {
         grouped[date] = 0;
       }
-      grouped[date] += order.total;
+      grouped[date] += parseFloat(order.total) || 0;
     });
     return grouped;
   }

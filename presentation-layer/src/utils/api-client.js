@@ -3,7 +3,7 @@
  * Handles HTTP requests to backend API
  */
 
-const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000';
+const API_BASE_URL = import.meta.env.VITE_API_URL || 'http://127.0.0.1:3001';
 
 export const apiClient = {
   async request(endpoint, options = {}) {

@@ -21,21 +21,6 @@ router.post('/', authenticateToken, async (req, res, next) => {
 });
 
 /**
- * UCU07: Order Tracking
- * GET /api/orders/:id
- */
-router.get('/:id', authenticateToken, async (req, res, next) => {
-  try {
-    const orderId = req.params.id;
-    const userId = req.user.id;
-    const order = await orderService.getOrderById(orderId, userId);
-    res.json(order);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
  * Get user's order history
  * GET /api/orders
  */
@@ -45,6 +30,35 @@ router.get('/', authenticateToken, async (req, res, next) => {
     const { status, page, limit } = req.query;
     const orders = await orderService.getUserOrders(userId, { status, page, limit });
     res.json(orders);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * UCA4: Get All Orders (Admin only)
+ * GET /api/orders/admin/all
+ */
+router.get('/admin/all', authenticateToken, requireAdmin, async (req, res, next) => {
+  try {
+    const { status, page, limit } = req.query;
+    const orders = await orderService.getAllOrders({ status, page, limit });
+    res.json(orders);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * UCU07: Order Tracking
+ * GET /api/orders/:id
+ */
+router.get('/:id', authenticateToken, async (req, res, next) => {
+  try {
+    const orderId = req.params.id;
+    const userId = req.user.id;
+    const order = await orderService.getOrderById(orderId, userId);
+    res.json(order);
   } catch (error) {
     next(error);
   }
@@ -61,20 +75,6 @@ router.post('/:id/payment', authenticateToken, async (req, res, next) => {
     const { paymentMethod, paymentData } = req.body;
     const result = await orderService.processPayment(orderId, userId, paymentMethod, paymentData);
     res.json(result);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
- * UCA4: Get All Orders (Admin only)
- * GET /api/orders/admin/all
- */
-router.get('/admin/all', authenticateToken, requireAdmin, async (req, res, next) => {
-  try {
-    const { status, page, limit } = req.query;
-    const orders = await orderService.getAllOrders({ status, page, limit });
-    res.json(orders);
   } catch (error) {
     next(error);
   }

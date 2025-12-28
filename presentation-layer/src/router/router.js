@@ -126,7 +126,8 @@ export class Router {
 }
 
 // Make router accessible globally for navigation
-window.router = null;
+// Will be set to the Router instance in main.js
+window.router = window.router;
 document.addEventListener('DOMContentLoaded', () => {
   // Router will be initialized in main.js
 });

@@ -20,20 +20,6 @@ router.get('/', async (req, res, next) => {
 });
 
 /**
- * UCU01: Get Product Detail
- * GET /api/menu/:id
- */
-router.get('/:id', async (req, res, next) => {
-  try {
-    const productId = req.params.id;
-    const product = await menuService.getProductById(productId);
-    res.json(product);
-  } catch (error) {
-    next(error);
-  }
-});
-
-/**
  * UCU04: Search & Filter
  * GET /api/menu/search
  */
@@ -48,6 +34,20 @@ router.get('/search', async (req, res, next) => {
       sortBy
     });
     res.json(results);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * UCU01: Get Product Detail
+ * GET /api/menu/:id
+ */
+router.get('/:id', async (req, res, next) => {
+  try {
+    const productId = req.params.id;
+    const product = await menuService.getProductById(productId);
+    res.json(product);
   } catch (error) {
     next(error);
   }

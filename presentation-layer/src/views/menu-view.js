@@ -53,10 +53,10 @@ export default class MenuView {
           <div class="search-filter-bar">
             <input type="text" id="search-input" placeholder="Tìm kiếm..." />
             <div class="filter-buttons">
-              <button onclick="this.filterByCategory('coffee')">Cà phê</button>
-              <button onclick="this.filterByCategory('tea')">Trà & Sữa</button>
-              <button onclick="this.filterByCategory('cake')">Bánh</button>
-              <button onclick="this.filterByCategory(null)">Tất cả</button>
+              <button onclick="menuView.filterByCategory('coffee')">Cà phê</button>
+              <button onclick="menuView.filterByCategory('tea')">Trà & Sữa</button>
+              <button onclick="menuView.filterByCategory('cake')">Bánh</button>
+              <button onclick="menuView.filterByCategory(null)">Tất cả</button>
             </div>
           </div>
         </section>
@@ -79,6 +79,15 @@ export default class MenuView {
 
     // Store reference for event handlers
     window.menuView = this;
+
+    const searchInput = document.getElementById('search-input');
+    if (searchInput) {
+      searchInput.addEventListener('keydown', (e) => {
+        if (e.key !== 'Enter') return;
+        const value = (searchInput.value || '').trim();
+        this.router.navigate(value ? `/menu?search=${encodeURIComponent(value)}` : '/menu');
+      });
+    }
   }
 
   async addToCart(productId) {

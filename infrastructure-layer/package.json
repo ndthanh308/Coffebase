@@ -1,0 +1,11 @@
+{
+  "name": "coffeebase-infrastructure",
+  "private": true,
+  "type": "module",
+  "description": "Local-only dependencies for infrastructure-layer modules (Supabase, payment gateways, logger)",
+  "dependencies": {
+    "@supabase/supabase-js": "^2.38.4",
+    "axios": "^1.6.2",
+    "dotenv": "^16.3.1"
+  }
+}

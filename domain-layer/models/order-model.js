@@ -128,5 +128,27 @@ export class OrderModel {
 
     return data;
   }
+
+  /**
+   * Update payment info (status + transaction id)
+   */
+  static async updatePayment(orderId, { status = 'paid', transactionId }) {
+    const { data, error } = await supabaseClient
+      .from('orders')
+      .update({
+        status,
+        transaction_id: transactionId,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', orderId)
+      .select()
+      .single();
+
+    if (error) {
+      throw new Error(`Database error: ${error.message}`);
+    }
+
+    return data;
+  }
 }
 

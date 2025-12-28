@@ -41,8 +41,9 @@ export class OrderService {
       throw new Error('Order not found');
     }
 
-    // Check if user owns this order or is admin
-    if (order.userId !== userId && !this.isAdmin(userId)) {
+    // Check if user owns this order
+    // Note: Supabase returns snake_case columns (user_id)
+    if (order.user_id !== userId) {
       throw new Error('Access denied');
     }
 
@@ -70,7 +71,7 @@ export class OrderService {
    * Business Rules: All status changes must be accurately recorded in database
    */
   async updateOrderStatus(orderId, status) {
-    const validStatuses = ['ordered', 'processing', 'ready', 'completed', 'cancelled'];
+    const validStatuses = ['ordered', 'paid', 'processing', 'ready', 'completed', 'cancelled'];
     if (!validStatuses.includes(status)) {
       throw new Error('Invalid order status');
     }
@@ -94,7 +95,7 @@ export class OrderService {
       throw new Error('Order not found');
     }
 
-    if (order.userId !== userId) {
+    if (order.user_id !== userId) {
       throw new Error('Access denied');
     }
 
@@ -110,8 +111,11 @@ export class OrderService {
       paymentData
     });
 
-    // Update order status
-    await OrderModel.updateStatus(orderId, 'paid');
+    // Persist payment
+    await OrderModel.updatePayment(orderId, {
+      status: 'paid',
+      transactionId: paymentResult.transactionId
+    });
 
     return {
       success: true,
@@ -131,7 +135,7 @@ export class OrderService {
       throw new Error('Order not found');
     }
 
-    if (order.userId !== userId) {
+    if (order.user_id !== userId) {
       throw new Error('Access denied');
     }
 
@@ -157,16 +161,8 @@ export class OrderService {
    */
   calculateTotal(items) {
     return items.reduce((total, item) => {
-      return total + (item.price * item.quantity);
+      return total + ((parseFloat(item.price) || 0) * (parseInt(item.quantity, 10) || 0));
     }, 0);
-  }
-
-  /**
-   * Check if user is admin (placeholder)
-   */
-  isAdmin(userId) {
-    // TODO: Implement admin check
-    return false;
   }
 }
 

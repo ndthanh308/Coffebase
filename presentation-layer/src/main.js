@@ -12,6 +12,12 @@ const stateManager = new StateManager();
 // Initialize router
 const router = new Router(stateManager);
 
+// Make router available for inline onclick handlers
+window.router = router;
+
+// Expose router for inline navigation handlers
+window.router = router;
+
 // Start the application
 document.addEventListener('DOMContentLoaded', () => {
   router.init();

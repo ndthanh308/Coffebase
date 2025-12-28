@@ -1,0 +1,204 @@
+/**
+ * Product Detail View (Customization)
+ * UCU05: Customize Drink
+ */
+
+import { apiClient } from '../utils/api-client.js';
+
+export default class ProductDetailView {
+  constructor(stateManager, router) {
+    this.stateManager = stateManager;
+    this.router = router;
+
+    this.product = null;
+    this.customization = {
+      size: 'M',
+      sugar: '100',
+      ice: '100',
+      toppings: []
+    };
+    this.quantity = 1;
+  }
+
+  async render(params = {}) {
+    const app = document.getElementById('app');
+    app.innerHTML = '<div id="loading">Loading product...</div>';
+
+    try {
+      const productId = params.id;
+      const product = await apiClient.get(`/api/menu/${productId}`);
+      this.product = product;
+
+      this.renderProduct();
+    } catch (error) {
+      console.error('Error loading product:', error);
+      app.innerHTML = '<div class="error">Không thể tải sản phẩm. Vui lòng thử lại sau.</div>';
+    }
+  }
+
+  renderProduct() {
+    const app = document.getElementById('app');
+    const product = this.product;
+
+    const imageUrl = product.image_url || '/images/placeholder.jpg';
+    const basePrice = Number(product.price || 0);
+    const finalPrice = this.calculateFinalPrice(basePrice, this.customization, this.quantity);
+
+    app.innerHTML = `
+      <header class="header">
+        <div class="container">
+          <div class="logo" onclick="router.navigate('/')">Coffee Base</div>
+          <nav class="nav">
+            <a href="#" onclick="router.navigate('/')">Trang chủ</a>
+            <a href="#" onclick="router.navigate('/menu')" class="active">Thực đơn</a>
+          </nav>
+          <div class="header-actions">
+            <button onclick="router.navigate('/cart')">Giỏ hàng (${this.stateManager.cart.length})</button>
+          </div>
+        </div>
+      </header>
+
+      <main class="main">
+        <div class="container">
+          <div class="product-detail">
+            <div>
+              <img src="${imageUrl}" alt="${product.name}" />
+            </div>
+
+            <div class="product-detail-card">
+              <h1>${product.name}</h1>
+              <p>${product.description || ''}</p>
+
+              <div class="option-group">
+                <h3>Kích cỡ</h3>
+                <div class="option-row">
+                  ${this.renderRadio('size', 'S', 'S')}
+                  ${this.renderRadio('size', 'M', 'M')}
+                  ${this.renderRadio('size', 'L', 'L')}
+                </div>
+              </div>
+
+              <div class="option-group">
+                <h3>Mức đường</h3>
+                <div class="option-row">
+                  ${this.renderRadio('sugar', '100', '100%')}
+                  ${this.renderRadio('sugar', '70', '70%')}
+                  ${this.renderRadio('sugar', '50', '50%')}
+                  ${this.renderRadio('sugar', '0', 'Không đường')}
+                </div>
+              </div>
+
+              <div class="option-group">
+                <h3>Mức đá</h3>
+                <div class="option-row">
+                  ${this.renderRadio('ice', '100', '100%')}
+                  ${this.renderRadio('ice', '70', '70%')}
+                  ${this.renderRadio('ice', '50', '50%')}
+                  ${this.renderRadio('ice', '0', 'Không đá')}
+                </div>
+              </div>
+
+              <div class="option-group">
+                <h3>Topping</h3>
+                <div class="option-row">
+                  ${this.renderTopping('Pearl', 'Trân châu')}
+                  ${this.renderTopping('Cheese', 'Kem cheese')}
+                  ${this.renderTopping('Jelly', 'Thạch')}
+                </div>
+                <p style="margin-top:0.25rem; font-size:0.9rem;">(Tạm tính +5.000đ mỗi topping)</p>
+              </div>
+
+              <div class="option-group">
+                <h3>Số lượng</h3>
+                <div class="quantity-row">
+                  <input id="qty" type="number" min="1" value="${this.quantity}" onchange="productDetailView.onQuantityChange(this.value)" />
+                </div>
+              </div>
+
+              <div class="product-detail-actions">
+                <button onclick="router.navigate('/menu')">Quay lại</button>
+                <button onclick="productDetailView.addToCart()">Thêm vào giỏ</button>
+                <span class="price">${finalPrice.toLocaleString('vi-VN')} đ</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    `;
+
+    window.productDetailView = this;
+  }
+
+  renderRadio(field, value, label) {
+    const checked = this.customization[field] === value ? 'checked' : '';
+    return `
+      <label>
+        <input type="radio" name="${field}" value="${value}" ${checked} onchange="productDetailView.onOptionChange('${field}', '${value}')" />
+        ${label}
+      </label>
+    `;
+  }
+
+  renderTopping(value, label) {
+    const checked = this.customization.toppings.includes(value) ? 'checked' : '';
+    return `
+      <label>
+        <input type="checkbox" value="${value}" ${checked} onchange="productDetailView.onToppingToggle('${value}', this.checked)" />
+        ${label}
+      </label>
+    `;
+  }
+
+  onOptionChange(field, value) {
+    this.customization[field] = value;
+    this.renderProduct();
+  }
+
+  onToppingToggle(value, enabled) {
+    const next = new Set(this.customization.toppings);
+    if (enabled) next.add(value);
+    else next.delete(value);
+    this.customization.toppings = Array.from(next);
+    this.renderProduct();
+  }
+
+  onQuantityChange(value) {
+    const parsed = parseInt(value, 10);
+    this.quantity = Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+    this.renderProduct();
+  }
+
+  calculateFinalPrice(basePrice, customization, quantity) {
+    // Simple placeholder calculation aligned with docs (auto-calc final price), can be improved later.
+    const multipliers = { S: 1.0, M: 1.2, L: 1.5 };
+    const sizeMultiplier = multipliers[customization.size] || 1.0;
+
+    const toppingCost = (customization.toppings?.length || 0) * 5000;
+    const perItem = Math.round(basePrice * sizeMultiplier + toppingCost);
+
+    return perItem * (quantity || 1);
+  }
+
+  addToCart() {
+    if (!this.product) return;
+
+    const basePrice = Number(this.product.price || 0);
+    const perItemPrice = this.calculateFinalPrice(basePrice, this.customization, 1);
+
+    this.stateManager.addToCart({
+      productId: this.product.id,
+      name: this.product.name,
+      price: perItemPrice,
+      quantity: this.quantity,
+      customization: {
+        size: this.customization.size,
+        sugar: this.customization.sugar,
+        ice: this.customization.ice,
+        toppings: [...this.customization.toppings]
+      }
+    });
+
+    alert('Đã thêm vào giỏ hàng');
+    this.router.navigate('/menu');
+  }
+}
