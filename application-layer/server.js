@@ -58,11 +58,13 @@ const { default: authRoutes } = await import('./controllers/auth-controller.js')
 const { default: menuRoutes } = await import('./controllers/menu-controller.js');
 const { default: orderRoutes } = await import('./controllers/order-controller.js');
 const { default: analyticsRoutes } = await import('./controllers/analytics-controller.js');
+const { default: aboutRoutes } = await import('./controllers/about-controller.js');
 
 app.use('/api/auth', authRoutes);
 app.use('/api/menu', menuRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/analytics', analyticsRoutes);
+app.use('/api/about', aboutRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

@@ -9,6 +9,7 @@ export class Router {
     this.routes = {
       '/': () => this.renderView('home'),
       '/menu': () => this.renderView('menu'),
+      '/about': () => this.renderView('about'),
       '/product/:id': (params) => this.renderView('product-detail', params),
       '/cart': () => this.renderView('cart'),
       '/checkout': () => this.renderView('checkout'),

@@ -1,0 +1,48 @@
+{
+  "group": {
+    "name": "Newbie Coders",
+    "description": "Xin chào chúng tôi là Newbie Coders, những tập sự trong ngành công nghệ phần mềm, hi vọng sẽ được học hỏi thêm thật nhiều từ góp ý của mọi người"
+  },
+  "members": [
+    {
+      "name": "Nguyễn Mạnh Cường",
+      "title": "Quản lý dự án",
+      "roles": ["Quản lý dự án", "DevOps", "Tester"],
+      "motto": "Đợi Vủ Phát xíu",
+      "image_url": null,
+      "sort_order": 1
+    },
+    {
+      "name": "Vũ Ngọc Minh Quang",
+      "title": "Thư ký",
+      "roles": ["Back-end", "Thư ký", "Tester"],
+      "motto": "No Pain No Pain",
+      "image_url": null,
+      "sort_order": 2
+    },
+    {
+      "name": "Trương Vủ Phát",
+      "title": "Front-end",
+      "roles": ["Front-end", "DevOps", "Tester"],
+      "motto": "Sống một kiếp người bình an là được",
+      "image_url": null,
+      "sort_order": 3
+    },
+    {
+      "name": "Nguyễn Đồng Thanh",
+      "title": "Full-stack",
+      "roles": ["Back-end", "Front-end", "DevOps", "Full-stack", "Tester"],
+      "motto": "Đi khảo sát thị trường nào",
+      "image_url": null,
+      "sort_order": 4
+    },
+    {
+      "name": "Nguyễn Minh Việt",
+      "title": "Hỗ trợ tài liệu",
+      "roles": ["Tài liệu", "PA", "Tester"],
+      "motto": "Được",
+      "image_url": null,
+      "sort_order": 5
+    }
+  ]
+}

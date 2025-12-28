@@ -1,0 +1,98 @@
+[
+  {
+    "name": "Espresso",
+    "description": "Cà phê Espresso đậm đà, shot đơn.",
+    "price": 25000,
+    "category": "coffee",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Latte",
+    "description": "Latte béo nhẹ, thơm mùi sữa.",
+    "price": 45000,
+    "category": "coffee",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Cappuccino",
+    "description": "Cappuccino với lớp foam mịn.",
+    "price": 45000,
+    "category": "coffee",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Mocha",
+    "description": "Cà phê hòa quyện cùng chocolate.",
+    "price": 52000,
+    "category": "coffee",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Bạc xỉu",
+    "description": "Sữa nhiều, cà phê nhẹ, dễ uống.",
+    "price": 32000,
+    "category": "coffee",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Trà sữa truyền thống",
+    "description": "Trà sữa thơm béo, ngọt dịu.",
+    "price": 39000,
+    "category": "tea",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Trà xanh sữa",
+    "description": "Matcha thanh, sữa béo.",
+    "price": 42000,
+    "category": "tea",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Trà chanh",
+    "description": "Trà chanh thanh mát.",
+    "price": 25000,
+    "category": "tea",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Trà vải",
+    "description": "Trà vải thơm ngọt.",
+    "price": 35000,
+    "category": "tea",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Bánh tiramisu",
+    "description": "Tiramisu mềm, thơm cacao.",
+    "price": 55000,
+    "category": "cake",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Bánh brownie",
+    "description": "Brownie chocolate đậm vị.",
+    "price": 45000,
+    "category": "cake",
+    "image_url": null,
+    "is_active": true
+  },
+  {
+    "name": "Bánh cookie",
+    "description": "Cookie giòn thơm bơ.",
+    "price": 25000,
+    "category": "cake",
+    "image_url": null,
+    "is_active": true
+  }
+]

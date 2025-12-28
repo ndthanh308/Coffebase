@@ -40,6 +40,7 @@ export default class MenuView {
           <nav class="nav">
             <a href="#" onclick="router.navigate('/')">Trang chủ</a>
             <a href="#" onclick="router.navigate('/menu')" class="active">Thực đơn</a>
+            <a href="#" onclick="router.navigate('/about')">Về chúng tôi</a>
           </nav>
           <div class="header-actions">
             <button onclick="router.navigate('/cart')">Giỏ hàng (${this.stateManager.cart.length})</button>

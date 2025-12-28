@@ -19,7 +19,7 @@ export default class HomeView {
             <a href="#" onclick="router.navigate('/')">Trang chủ</a>
             <a href="#" onclick="router.navigate('/menu')">Thực đơn</a>
             <a href="#">Khuyến mãi</a>
-            <a href="#">Về chúng tôi</a>
+            <a href="#" onclick="router.navigate('/about')">Về chúng tôi</a>
           </nav>
           <div class="header-actions">
             ${this.stateManager.isAuthenticated() 
