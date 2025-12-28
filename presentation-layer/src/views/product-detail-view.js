@@ -11,6 +11,7 @@ export default class ProductDetailView {
     this.router = router;
 
     this.product = null;
+    this.reviewData = { stats: { count: 0, average: 0 }, reviews: [] };
     this.customization = {
       size: 'M',
       sugar: '100',
@@ -29,6 +30,13 @@ export default class ProductDetailView {
       const product = await apiClient.get(`/api/menu/${productId}`);
       this.product = product;
 
+      try {
+        this.reviewData = await apiClient.get(`/api/menu/${productId}/reviews`);
+      } catch (e) {
+        console.warn('Could not load reviews:', e);
+        this.reviewData = { stats: { count: 0, average: 0 }, reviews: [] };
+      }
+
       this.renderProduct();
     } catch (error) {
       console.error('Error loading product:', error);
@@ -39,6 +47,9 @@ export default class ProductDetailView {
   renderProduct() {
     const app = document.getElementById('app');
     const product = this.product;
+
+    const stats = this.reviewData?.stats || { count: 0, average: 0 };
+    const reviews = this.reviewData?.reviews || [];
 
     const imageUrl = product.image_url || '/images/placeholder.jpg';
     const basePrice = Number(product.price || 0);
@@ -120,6 +131,12 @@ export default class ProductDetailView {
                 <button onclick="productDetailView.addToCart()">Thêm vào giỏ</button>
                 <span class="price">${finalPrice.toLocaleString('vi-VN')} đ</span>
               </div>
+
+              <div class="option-group">
+                <h3>Đánh giá (${stats.count || 0})</h3>
+                <p style="margin-top:0.25rem; font-size:0.95rem;">Điểm trung bình: <strong>${(stats.average || 0).toFixed(1)}</strong> / 5</p>
+                ${reviews.length ? this.renderReviews(reviews) : '<p style="margin-top:0.5rem;">Chưa có đánh giá nào.</p>'}
+              </div>
             </div>
           </div>
         </div>
@@ -127,6 +144,42 @@ export default class ProductDetailView {
     `;
 
     window.productDetailView = this;
+  }
+
+  renderReviews(reviews) {
+    const toStars = (rating) => {
+      const r = Math.max(1, Math.min(5, Number(rating) || 0));
+      return `${'★'.repeat(r)}${'☆'.repeat(5 - r)}`;
+    };
+
+    const escapeHtml = (str) => {
+      if (str === null || str === undefined) return '';
+      return String(str)
+        .replaceAll('&', '&amp;')
+        .replaceAll('<', '&lt;')
+        .replaceAll('>', '&gt;')
+        .replaceAll('"', '&quot;')
+        .replaceAll("'", '&#039;');
+    };
+
+    const items = reviews
+      .map((r) => {
+        const comment = r.comment ? `<div style="margin-top:0.25rem;">${escapeHtml(r.comment)}</div>` : '';
+        const who = escapeHtml(r.reviewer || 'Ẩn danh');
+        const stars = toStars(r.rating);
+        return `
+          <div style="padding:0.75rem 0; border-top:1px solid #eee;">
+            <div style="display:flex; justify-content:space-between; gap:1rem;">
+              <div><strong>${who}</strong></div>
+              <div style="white-space:nowrap;">${stars}</div>
+            </div>
+            ${comment}
+          </div>
+        `;
+      })
+      .join('');
+
+    return `<div style="margin-top:0.5rem;">${items}</div>`;
   }
 
   renderRadio(field, value, label) {

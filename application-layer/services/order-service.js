@@ -1,4 +1,5 @@
 import { OrderModel } from '../../domain-layer/models/order-model.js';
+import { ReviewModel } from '../../domain-layer/models/review-model.js';
 import { PaymentGateway } from '../../infrastructure-layer/gateways/payment-gateway.js';
 
 export class OrderService {
@@ -139,21 +140,39 @@ export class OrderService {
       throw new Error('Access denied');
     }
 
-    if (order.status !== 'completed') {
-      throw new Error('Only completed orders can be reviewed');
+    if (order.status !== 'paid' && order.status !== 'completed') {
+      throw new Error('Only paid or completed orders can be reviewed');
     }
 
-    // TODO: Implement review creation
-    const review = {
+    const parsedRating = parseInt(rating, 10);
+    if (!Number.isFinite(parsedRating) || parsedRating < 1 || parsedRating > 5) {
+      throw new Error('Invalid rating');
+    }
+
+    if (!productId) {
+      throw new Error('productId is required');
+    }
+
+    const items = Array.isArray(order.items) ? order.items : [];
+    const containsProduct = items.some((it) => String(it?.productId) === String(productId));
+    if (!containsProduct) {
+      throw new Error('Product not found in order items');
+    }
+
+    const existing = await ReviewModel.findOne({ orderId, userId, productId });
+    if (existing) {
+      throw new Error('Review already submitted for this product');
+    }
+
+    const created = await ReviewModel.create({
       orderId,
       userId,
       productId,
-      rating,
-      comment,
-      createdAt: new Date()
-    };
+      rating: parsedRating,
+      comment
+    });
 
-    return review;
+    return created;
   }
 
   /**

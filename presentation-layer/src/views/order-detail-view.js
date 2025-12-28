@@ -9,6 +9,8 @@ export default class OrderDetailView {
   constructor(stateManager, router) {
     this.stateManager = stateManager;
     this.router = router;
+
+    this.paymentMethod = 'card';
   }
 
   async render(params = {}) {
@@ -80,6 +82,32 @@ export default class OrderDetailView {
                   <div class="cart-items" style="margin-top:0.75rem;">
                     ${items.length === 0 ? `<div class="error">Đơn hàng không có sản phẩm.</div>` : items.map((it) => this.renderItem(it)).join('')}
                   </div>
+
+                  ${(status === 'paid' || status === 'completed') ? `
+                    <h3 style="margin-top:1rem;">Đánh giá</h3>
+                    <div style="margin-top:0.75rem; display:grid; gap:0.75rem;">
+                      ${items.map((it) => this.renderReviewForm(order.id, it)).join('')}
+                    </div>
+                  ` : ''}
+
+                  ${status === 'ordered' ? `
+                    <h3 style="margin-top:1rem;">Thanh toán</h3>
+                    <div class="auth-form" style="margin-top:0.75rem;">
+                      <div>
+                        <label for="paymentMethod">Phương thức</label>
+                        <select id="paymentMethod" onchange="orderDetailView.onPaymentMethodChange(this.value)">
+                          <option value="card">Thẻ</option>
+                          <option value="credit">Điểm tích luỹ</option>
+                          <option value="momo">Momo</option>
+                          <option value="zalopay">ZaloPay</option>
+                        </select>
+                      </div>
+                      <button type="button" onclick="orderDetailView.pay('${this.escapeHtml(order.id)}')">Thanh toán</button>
+                      <p style="margin-top:0.5rem; color:#666; font-size:0.9rem;">
+                        (Momo/ZaloPay cần cấu hình key; Thẻ/Điểm dùng chế độ mô phỏng.)
+                      </p>
+                    </div>
+                  ` : ''}
                 </div>
               </div>
 
@@ -100,6 +128,82 @@ export default class OrderDetailView {
     `;
 
     window.orderDetailView = this;
+  }
+
+  renderReviewForm(orderId, item) {
+    const productId = item?.productId;
+    if (!productId) return '';
+    const safeProductId = this.escapeHtml(String(productId));
+    const name = item?.name || 'Sản phẩm';
+
+    return `
+      <div class="cart-item">
+        <div class="cart-item-main">
+          <div class="cart-item-title">${this.escapeHtml(name)}</div>
+          <div class="auth-form" style="margin-top:0.5rem;">
+            <div>
+              <label for="rating-${safeProductId}">Số sao</label>
+              <select id="rating-${safeProductId}">
+                <option value="5">5</option>
+                <option value="4">4</option>
+                <option value="3">3</option>
+                <option value="2">2</option>
+                <option value="1">1</option>
+              </select>
+            </div>
+            <div>
+              <label for="comment-${safeProductId}">Nhận xét</label>
+              <input id="comment-${safeProductId}" type="text" placeholder="Viết nhận xét..." />
+            </div>
+            <button type="button" onclick="orderDetailView.submitReview('${this.escapeHtml(orderId)}','${safeProductId}')">Gửi đánh giá</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  async submitReview(orderId, productId) {
+    try {
+      const rating = document.getElementById(`rating-${productId}`)?.value;
+      const comment = document.getElementById(`comment-${productId}`)?.value;
+
+      await apiClient.post(`/api/orders/${orderId}/review`, {
+        productId,
+        rating,
+        comment
+      });
+
+      alert('Cảm ơn bạn đã đánh giá!');
+    } catch (error) {
+      const message = error?.message || 'Gửi đánh giá thất bại';
+      alert(message);
+      const lower = String(message).toLowerCase();
+      if (lower.includes('access token') || lower.includes('token')) {
+        this.router.navigate('/login');
+      }
+    }
+  }
+
+  onPaymentMethodChange(method) {
+    this.paymentMethod = method;
+  }
+
+  async pay(orderId) {
+    try {
+      const result = await apiClient.post(`/api/orders/${orderId}/payment`, {
+        paymentMethod: this.paymentMethod,
+        paymentData: {}
+      });
+      alert(`Thanh toán thành công. Mã giao dịch: ${result.transactionId}`);
+      this.render({ id: orderId });
+    } catch (error) {
+      const message = error?.message || 'Thanh toán thất bại';
+      alert(message);
+      const lower = String(message).toLowerCase();
+      if (lower.includes('access token') || lower.includes('token')) {
+        this.router.navigate('/login');
+      }
+    }
   }
 
   renderItem(item) {

@@ -1,9 +1,11 @@
 import express from 'express';
 import { MenuService } from '../services/menu-service.js';
+import { ReviewService } from '../services/review-service.js';
 import { authenticateToken, requireAdmin } from '../security/auth-middleware.js';
 
 const router = express.Router();
 const menuService = new MenuService();
+const reviewService = new ReviewService();
 
 /**
  * UCU01: View Menu
@@ -48,6 +50,20 @@ router.get('/:id', async (req, res, next) => {
     const productId = req.params.id;
     const product = await menuService.getProductById(productId);
     res.json(product);
+  } catch (error) {
+    next(error);
+  }
+});
+
+/**
+ * Public: View product reviews
+ * GET /api/menu/:id/reviews
+ */
+router.get('/:id/reviews', async (req, res, next) => {
+  try {
+    const productId = req.params.id;
+    const data = await reviewService.getProductReviews(productId);
+    res.json(data);
   } catch (error) {
     next(error);
   }

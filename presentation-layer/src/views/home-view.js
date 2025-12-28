@@ -54,11 +54,13 @@ export default class HomeView {
           </div>
           <div class="search-bar">
             <input type="text" placeholder="Tìm kiếm..." id="search-input">
-            <button onclick="this.handleSearch()">Tìm</button>
+            <button onclick="homeView.handleSearch()">Tìm</button>
           </div>
         </section>
       </main>
     `;
+
+    window.homeView = this;
   }
 
   handleSearch() {
